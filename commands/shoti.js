@@ -32,7 +32,7 @@ module.exports = {
                         );
                     }
 
-                    const videoPath = path.join(__dirname, 'shoti.mp4');
+                    const videoPath = path.join(__dirname, 'noprefix', 'shoti.mp4');
                     const videoResponse = await axios({
                         method: 'get',
                         url: videoUrl,

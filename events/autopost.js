@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const cron = require('node-cron');
 
+let lastPostedHour = -1;
+
 module.exports = {
     name: "autopost",
     description: "Automatically posts a random dog image every 35 minutes.",
@@ -14,7 +16,7 @@ module.exports = {
         const validImageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
 
         const downloadImage = async (url) => {
-            const imagePath = path.join(__dirname, 'tempImage.jpg');
+            const imagePath = path.join(__dirname, 'dog.jpg');
             const response = await axios({
                 method: 'GET',
                 url,
@@ -29,6 +31,10 @@ module.exports = {
         };
 
         const postImage = async () => {
+            const currentHour = new Date().getHours();
+            const currentMinute = new Date().getMinutes();
+            if (currentHour === lastPostedHour && currentMinute % 35 !== 0) return;
+
             try {
                 let imageUrl;
                 let attempts = 0;
@@ -51,6 +57,7 @@ module.exports = {
                 });
 
                 fs.unlinkSync(imagePath);
+                lastPostedHour = currentHour;
             } catch (error) {
                 console.error('Error posting image:', error);
             }

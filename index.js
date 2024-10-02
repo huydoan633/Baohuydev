@@ -66,13 +66,16 @@ async function autoLogin() {
     const appStates = JSON.parse(fs.readFileSync(appStatePath, "utf8"));
     appStates.forEach(({ appState, prefix }) => {
       const proxy = getRandomProxy();
-      login({ appState, proxy }, (err, api) => {
+      login({ appState, proxy }, async (err, api) => {
         if (err) {
           console.error("Failed to login automatically:", err);
           return;
         }
         const cuid = api.getCurrentUserID();
-        global.NashBoT.onlineUsers.set(cuid, { userID: cuid, prefix });
+        const userDetails = await api.getUserInfo(cuid);
+        const BotName = userDetails[cuid].name;
+        const botProfile = userDetails[cuid];
+        global.NashBoT.onlineUsers.set(cuid, { userID: cuid, prefix, BotName, botProfile });
         global.NashBoT.prefixes.set(cuid, prefix);
         setupBot(api, prefix);
       });
@@ -91,12 +94,15 @@ app.post("/login", (req, res) => {
     fs.writeFileSync(appStatePath, JSON.stringify(appStates));
     
     const proxy = getRandomProxy();
-    login({ appState, proxy }, (err, api) => {
+    login({ appState, proxy }, async (err, api) => {
       if (err) {
         return res.status(500).send("Failed to login");
       }
       const cuid = api.getCurrentUserID();
-      global.NashBoT.onlineUsers.set(cuid, { userID: cuid, prefix });
+      const userDetails = await api.getUserInfo(cuid);
+      const BotName = userDetails[cuid].name;
+      const botProfile = userDetails[cuid];
+      global.NashBoT.onlineUsers.set(cuid, { userID: cuid, prefix, BotName, botProfile });
       global.NashBoT.prefixes.set(cuid, prefix);
       setupBot(api, prefix);
       res.sendStatus(200);
@@ -169,8 +175,8 @@ async function handleMessage(api, event, prefix) {
 
 app.get("/active-sessions", async (req, res) => {
   const json = {};
-  global.NashBoT.onlineUsers.forEach(({ userID, prefix }, uid) => {
-    json[uid] = { userID, prefix };
+  global.NashBoT.onlineUsers.forEach(({ userID, prefix, BotName, botProfile }, uid) => {
+    json[uid] = { userID, prefix, BotName, botProfile };
   });
   res.json(json);
 });

@@ -15,6 +15,8 @@
     "body-parser": "^1.20.3",
     "chatbox-fca-remake": "^2.0.6",
     "express": "^4.21.0",
-    "node-cron": "^3.0.3"
+    "express-rate-limit": "^7.4.0",
+    "node-cron": "^3.0.3",
+    "ping": "^0.4.4"
   }
 }
