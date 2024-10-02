@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("Logged in successfully!");
         botStateInput.value = "";
         prefixInput.value = "";
-        startCooldown(15); // Start the cooldown timer
+        startCooldown(15);
       } else {
         document.cookie = "loggedIn=; path=/; max-age=0";
         alert("Failed to login.");
@@ -87,9 +87,9 @@ document.addEventListener('DOMContentLoaded', () => {
       countdownDisplay.textContent = `Please wait ${timeLeft} seconds...`;
       if (timeLeft <= 0) {
         clearInterval(countdownInterval);
-        submitButton.disabled = false; // Enable the button after cooldown
+        submitButton.disabled = false;
         countdownDisplay.style.display = 'none';
-        isCooldown = false; // Reset cooldown state
+        isCooldown = false;
       }
     }, 1000);
   }

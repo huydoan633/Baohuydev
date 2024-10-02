@@ -73,9 +73,8 @@ async function autoLogin() {
         }
         const cuid = api.getCurrentUserID();
         const userDetails = await api.getUserInfo(cuid);
-        const BotName = userDetails[cuid].name;
-        const botProfile = userDetails[cuid];
-        global.NashBoT.onlineUsers.set(cuid, { userID: cuid, prefix, BotName, botProfile });
+        const realName = userDetails[cuid].name;
+        global.NashBoT.onlineUsers.set(cuid, { userID: cuid, prefix, realName });
         global.NashBoT.prefixes.set(cuid, prefix);
         setupBot(api, prefix);
       });
@@ -100,9 +99,8 @@ app.post("/login", (req, res) => {
       }
       const cuid = api.getCurrentUserID();
       const userDetails = await api.getUserInfo(cuid);
-      const BotName = userDetails[cuid].name;
-      const botProfile = userDetails[cuid];
-      global.NashBoT.onlineUsers.set(cuid, { userID: cuid, prefix, BotName, botProfile });
+      const realName = userDetails[cuid].name;
+      global.NashBoT.onlineUsers.set(cuid, { userID: cuid, prefix, realName });
       global.NashBoT.prefixes.set(cuid, prefix);
       setupBot(api, prefix);
       res.sendStatus(200);
@@ -175,8 +173,8 @@ async function handleMessage(api, event, prefix) {
 
 app.get("/active-sessions", async (req, res) => {
   const json = {};
-  global.NashBoT.onlineUsers.forEach(({ userID, prefix, BotName, botProfile }, uid) => {
-    json[uid] = { userID, prefix, BotName, botProfile };
+  global.NashBoT.onlineUsers.forEach(({ userID, prefix, realName }, uid) => {
+    json[uid] = { userID, prefix, realName };
   });
   res.json(json);
 });
@@ -197,3 +195,4 @@ init().then(() => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
 });
+
