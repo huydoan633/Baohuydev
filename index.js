@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
-const login = require("chatbox-fca-remake");
+const login = require("./josh-fca-api");
 const fs = require("fs");
 const detectTyping = require("./handle/detectTyping");
 const autoReact = require("./handle/autoReact");
@@ -20,10 +20,7 @@ global.NashBoT = {
 };
 
 global.NashBot = {
-  ENDPOINT: "https://nash-rest-api-production.up.railway.app/",
-  END: "https://deku-rest-api.gleeze.com/",
-  KEN: "https://api.kenliejugarap.com/",
-  MONEY: "https://frizzyelectricclients-production.up.railway.app/"
+  ENDPOINT: "https://rest-api.joshuaapostol.site/",
 };
 
 async function loadCommands() {

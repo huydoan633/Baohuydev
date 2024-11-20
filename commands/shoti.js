@@ -1,76 +1,44 @@
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
+const axios = require("axios");
+const path = require("path");
+const fs = require("fs");
 
 module.exports = {
     name: "shoti",
-    description: "trip ko kang",
-    nashPrefix: false,
+    description: "Generate random TikTok girl edit videos",
+    nashPrefix: true,
     version: "1.0.0",
     role: 0,
     cooldowns: 5,
     async execute(api, event, args) {
         const { threadID, messageID } = event;
 
-        api.sendMessage(
-            "[ 𝗦𝗛𝗢𝗧𝗜 ]\n\n" +
-            "Mag Antay Ka GAGO...",
-            threadID,
-            async (err, info) => {
-                if (err) return;
+        try {
+            api.sendMessage("Video is sending, please wait...", threadID, messageID);
 
-                try {
-                    const response = await axios.get('https://shoti.kenliejugarap.com/getvideo.php?apikey=shoti-0763839a3b9de35ae3da73816d087d57d1bbae9f8997d9ebd0da823850fb80917e69d239a7f7db34b4d139a5e3b02658ed26f49928e5ab40f57c9798c9ae7290c536d8378ea8b01399723aaf35f62fae7c58d08f04');
-                    const videoData = response.data;
-                    const videoUrl = videoData.videoDownloadLink;
+            const response = await axios.post("https://shoti1.onrender.com/api/request/f");
+            const videoUrl = response.data.url;
+            const username = response.data.username;
+            const nickname = response.data.nickname;
 
-                    if (!videoUrl) {
-                        return api.editMessage(
-                            "[ 𝗦𝗛𝗢𝗧𝗜 ]\n\n" +
-                            "❌ Failed to fetch the video. Please try again.",
-                            info.messageID
-                        );
-                    }
+            const videoPath = path.resolve(__dirname, 'girledit_video.mp4');
+            const writer = fs.createWriteStream(videoPath);
+            const responseStream = await axios({
+                url: videoUrl,
+                method: 'GET',
+                responseType: 'stream'
+            });
 
-                    const videoPath = path.join(__dirname, 'noprefix', 'shoti.mp4');
-                    const videoResponse = await axios({
-                        method: 'get',
-                        url: videoUrl,
-                        responseType: 'stream',
-                    });
+            responseStream.data.pipe(writer);
 
-                    const writer = fs.createWriteStream(videoPath);
-                    videoResponse.data.pipe(writer);
-
-                    writer.on('finish', () => {
-                        api.sendMessage({
-                            body: `[ 𝗦𝗛𝗢𝗧𝗜 ]\n\n` +
-                                  `🎬 Title: ${videoData.title || "No Title"}\n` +
-                                  `👤 Username: ${videoData.username || "Unknown"}\n\n` +
-                                  `Enjoy your video! 🎥`,
-                            attachment: fs.createReadStream(videoPath),
-                        }, threadID, () => {
-                            fs.unlinkSync(videoPath);
-                        });
-                    });
-
-                    writer.on('error', () => {
-                        api.editMessage(
-                            "[ 𝗦𝗛𝗢𝗧𝗜 ]\n\n" +
-                            "❌ An error occurred while downloading the video.",
-                            info.messageID
-                        );
-                    });
-
-                } catch (error) {
-                    api.editMessage(
-                        "[ 𝗦𝗛𝗢𝗧𝗜 𝗧𝗜𝗞𝗧𝗢𝗞 𝗩𝗜𝗗𝗘𝗢 ]\n\n" +
-                        "❌ Failed to process your request. Please try again later.",
-                        info.messageID
-                    );
-                }
-            },
-            messageID
-        );
-    },
+            writer.on('finish', () => {
+                api.sendMessage({
+                    body: `Username: ${username}\nNickname: ${nickname}`,
+                    attachment: fs.createReadStream(videoPath)
+                }, threadID, () => fs.unlinkSync(videoPath), messageID);
+            });
+        } catch (error) {
+            api.sendMessage(`Error fetching girl edit API!\n${error.message}`, threadID, messageID);
+            console.error('Error:', error.message);
+        }
+    }
 };
